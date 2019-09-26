@@ -3,9 +3,9 @@
 
 #include<cstdio>
 
-typedef enum {_id,_entero,_real,_eof,_err} token;
+typedef enum {_reservada,_id, _octal,_hexa,_real, _eof,_err} token;
 
-void open();
+void open(char*);
 void close();
 
 int read();
@@ -15,7 +15,7 @@ void fallback();
 
 void wsp();
 bool eof();
-bool identifier();
+token identifier();
 token num();
 token next();
 

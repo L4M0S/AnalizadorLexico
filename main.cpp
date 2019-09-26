@@ -5,7 +5,7 @@
 
 int main()
 {
-	open();
+	open("test.txt");
 	
 	
 	scanner();
