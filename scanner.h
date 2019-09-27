@@ -2,8 +2,14 @@
 #define scanner_h
 
 #include<cstdio>
+#include<map>
+#include<string>
+
+using namespace std;
 
 typedef enum {_reservada,_id, _octal,_hexa,_real, _comentario, _delimitacion,_aritmetico,_puntuacion,_asignacion, _eof,_error} token;
+
+
 
 void open(char*);
 void close();

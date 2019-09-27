@@ -4,10 +4,24 @@
 #include<cctype>
 #include<string>
 #include<iostream>
+#include<map>
+#include<set>
+#include <iterator>
 
 #define udef -1
 
 using namespace std;
+
+typedef std::map <int,string> Diccionario;
+
+Diccionario reservadas;
+
+void llenarDiccionario()
+{
+	reservadas[0]="identity";
+	reservadas[1]="transpose";
+	reservadas[2]="throw";
+}
 
 int p=0,q=0;
 
@@ -15,7 +29,7 @@ int findearchivo=0;
 
 int lineas=1;
 
-string cadena=" ";
+string cadena="";
 
 FILE *file;
 
@@ -27,11 +41,14 @@ void agregar(char a)
 void open(char* archivo)
 {
 	file=fopen(archivo,"r");
-	
+	/*
 	while(fgetc(file)!=EOF)
 	{	
-		//findearchivo++;
+	  	//findearchivo++;
 	}
+	*/
+	//findearchivo=ftell(file);
+	fseek(file,0,SEEK_END);
 	findearchivo=ftell(file);
 	//printf("- findearchivo:%i -\n",findearchivo);
 	//printf("- ftello:%i -\n\n",ftell(file));
@@ -96,6 +113,7 @@ void wsp()
 		{
 			//printf("\nsalto de linea\n");
 			lineas++;
+			//cout<<endl<<lineas<<endl;
 			fallback();
 			success();			
 		}
@@ -109,7 +127,9 @@ void wsp()
 bool eof()
 {
 	//*
-	if(ftell(file)>=findearchivo)
+	cout<<endl<<ftell(file)<<" "<<findearchivo<<endl;
+	if(ftell(file)>=findearchivo || feof(file) )
+	//if(read()==EOF)
 	{
 		//printf("true\n");
 		return true;
@@ -151,41 +171,51 @@ token identificador()
 		{
 			case 0:
 				if(c=='_') actual=1;
-				else if(isalpha(c)) actual=2;                                   //((c>='a' && c<='z') || (c>='A' && c<='Z')) actual=2;
+				else if(isalpha(c)) actual=2;                                   
 				else actual=udef;
-				if(!isspace(c))agregar(c);
+				//if(!isspace(c))agregar(c);
 				break;
 			case 1:
 				if(isdigit(c) || c=='_') actual=1;
 				else if(isalpha(c)) actual=2;
 				else actual=udef;
-				if(!isspace(c))agregar(c);
+				//if(!isspace(c))agregar(c);
 				break;
 			case 2:
 				if(isalpha(c) || isdigit(c) || c=='_') actual=2;
 				else if(c==39) actual=3;
 				else actual=udef;
-				if(!isspace(c))agregar(c);
+				//if(!isspace(c))agregar(c);
 				break;
 			case 3:
 				if(c==39) actual=3;
 				else actual=udef;
-				if(!isspace(c))agregar(c);
+				//if(!isspace(c))agregar(c);
 				break;
 		}
 		//c=NULL;
 		//printf("actual:%i ",actual);
+		if(actual!=udef)agregar(c);
 	}
 	//printf("\nprior:%i \n",prior);
 	if(prior==2 || prior==3)
 	{
+		for(int i=0;i<reservadas.size();i++)
+		{
+			if(cadena==reservadas[i])
+			{
+				fallback();
+				success();
+				return _reservada;	
+			}
+		}
 		fallback();
 		success();
 		return _id;		
 	}
 	else
 	{
-		cadena=" ";
+		cadena="";
 		fail();
 		return _error;
 	}
@@ -211,7 +241,7 @@ token numero()
 				else if(c>='1' && c<='9') {/*printf("actual:2 ");*/actual=5;}
 				else if((isalpha(c) && (c!='x'||c!='X')) || c=='_') actual=11; 
 				else { /*printf("udef ");*/actual=udef;}
-				if(!isspace(c))agregar(c);
+				//if(!isspace(c))agregar(c);
 				break;
 			case 1:
 				//printf("case1 ");
@@ -219,26 +249,26 @@ token numero()
 				else if(c=='x' || c=='X') actual=2;
 				else if(c=='.') actual=6;
 				else actual=udef;
-				if(!isspace(c))agregar(c);
+				//if(!isspace(c))agregar(c);
 				break;
 			case 2:
 				//printf("case2 ");
 				if(isdigit(c) || (c>='a' && c<='f') || (c>='A' && c<='F')) actual=3;
 				else actual=udef;
-				if(!isspace(c))agregar(c);
+				//if(!isspace(c))agregar(c);
 				break;
 			case 3:
 				//printf("case3 ");
 				if(isdigit(c) || (c>='a' && c<='f') || (c>='A' && c<='F')) actual=4;
 				else actual=udef;
-				if(!isspace(c))agregar(c);
+				//if(!isspace(c))agregar(c);
 				break;
 			case 4:
 				//printf("case4 ");
 				if(isdigit(c) || (c>='a' && c<='f') || (c>='A' && c<='F')) actual=3;
 				else if((isalpha(c) && ((c>='a' && c<='f')||(c>='A' && c<='F'))) || c=='_') actual=11;
 				else actual=udef;
-				if(!isspace(c))agregar(c);
+				//if(!isspace(c))agregar(c);
 				break;
 			case 5:
 				//printf("case5 ");
@@ -247,36 +277,36 @@ token numero()
 				else if(c=='E' || c=='e') actual=8;
 				else if((isalpha(c) && (c!='e'||c!='E')) || c=='_') actual=11;
 				else actual=udef;
-				if(!isspace(c))agregar(c);
+				//if(!isspace(c))agregar(c);
 				break;
 			case 6:
 				if(isdigit(c)) actual=7;
 				else actual=udef;
-				if(!isspace(c))agregar(c);
+				//if(!isspace(c))agregar(c);
 				break;
 			case 7:
 				if(isdigit(c)) actual=7;
 				else if(c=='E' || c=='e') actual=8;
 				else if((isalpha(c) && (c!='e'||c!='E')) || c=='_') actual=11;
 				else actual=udef;
-				if(!isspace(c))agregar(c);
+				//if(!isspace(c))agregar(c);
 				break;
 			case 8:
 				if(c=='+' || c=='-') actual=9;
 				else if(isdigit(c)) actual=10;
 				else actual=udef;
-				if(!isspace(c))agregar(c);
+				//if(!isspace(c))agregar(c);
 				break;
 			case 9:
 				if(isdigit(c)) actual=10;
 				else actual=udef;
-				if(!isspace(c))agregar(c);
+				//if(!isspace(c))agregar(c);
 				break;
 			case 10:
 				if(isdigit(c)) actual=10;
 				else if((isalpha(c) && (c!='e'||c!='E')) || c=='_') actual=11;
 				else actual=udef;
-				if(!isspace(c))agregar(c);
+				//if(!isspace(c))agregar(c);
 				break;
 			case 11:
 				actual=udef;
@@ -284,6 +314,7 @@ token numero()
 		}
 		//printf("actual:%i ",actual);
 		//c=NULL;
+		if(actual!=udef)agregar(c);
 	}
 	//printf("\nprior:%i \n",prior);
 	if(prior==1)
@@ -311,7 +342,7 @@ token numero()
 	}
 	else
 	{
-		cadena=" ";
+		cadena="";
 		fail();
 		return _error;
 	}
@@ -339,7 +370,7 @@ token comentario()
 			case 1:
 				//printf("case1 ");
 				if(c!=10) actual=1;
-				else if(c==10) {actual=2;lineas++;}
+				else if(c==10) {actual=2;lineas++;}//cout<<endl<<"c"<<lineas<<endl;
 				else actual=udef;
 				break;
 			case 2:
@@ -392,7 +423,7 @@ token especiales()
 				else if(c==';') actual=10;
 				else if(c==':') actual=11;
 				else actual=udef;
-				agregar(c);
+				
 				break;
 			case 1:
 				actual=udef;
@@ -430,6 +461,7 @@ token especiales()
 		}
 		//printf("actual:%i ",actual);
 		//c=NULL;
+		if(actual!=udef)agregar(c);
 	}
 	//printf("\nprior:%i \n",prior);
 	if(prior==1 || prior==2 || prior==3 || prior==4)
@@ -462,7 +494,7 @@ token especiales()
 	}	
 	else
 	{
-		cadena=" ";
+		cadena="";
 		fail();
 		return _error;
 	}
@@ -472,7 +504,7 @@ token next()
 {
 	//printf("next \n");
 	//printf("final ");
-	if(eof()){/*printf("fin ");*/return _eof;}
+	
 	
 	wsp();
 	
@@ -497,6 +529,8 @@ token next()
 	//*
 	switch(identificador())
 	{
+		case _reservada:  return _reservada;
+			break;
 		case _id: return _id; 
 			break;
 	}//*/
@@ -524,16 +558,18 @@ token next()
 	}
 	//*/
 	
-	
+	if(eof()){/*printf("fin ");*/return _eof;}
 	//printf("\n-fin error-\n ");
 	return _error;
 }
 
 void scanner()
 {	
+	llenarDiccionario();
 	//fseek(file,0,SEEK_SET);
 	//printf("%c",fgetc(file));
 	//*
+	//cout<<reservadas[1];
 	token a;
 	do
 	{
@@ -546,37 +582,41 @@ void scanner()
 				printf("comentario\n");
 				cadena=" ";
 				break;*/
+			case _reservada:
+				printf("reservada: ");cout<<cadena<<endl;
+				cadena="";
+				break;
 			case _id:
 				printf("identificador: ");cout<<cadena<<endl;
-				cadena=" ";
+				cadena="";
 				break;
 			case _octal:
 				printf("octal: ");cout<<cadena<<endl;
-				cadena=" ";
+				cadena="";
 				break;
 			case _hexa:
 				printf("hexadecimal: ");cout<<cadena<<endl;
-				cadena=" ";
+				cadena="";
 				break;
 			case _real:
 				printf("real: ");cout<<cadena<<endl;
-				cadena=" ";
+				cadena="";
 				break;
 			case _delimitacion:
 				printf("delimitacion: ");cout<<cadena<<endl;
-				cadena=" ";
+				cadena="";
 				break;
 			case _aritmetico:
 				printf("aritmetico: ");cout<<cadena<<endl;
-				cadena=" ";
+				cadena="";
 				break;
 			case _puntuacion:
 				printf("puntuacion: ");cout<<cadena<<endl;
-				cadena=" ";
+				cadena="";
 				break;
 			case _asignacion:
 				printf("asignacion: ");cout<<cadena<<endl;
-				cadena=" ";
+				cadena="";
 				break;
 			case _eof:
 				printf("\neof\n");
@@ -587,6 +627,8 @@ void scanner()
 				printf("Analisis interrumpido por error en la linea %i \n",lineas);
 				break;		
 		}
+		
+		
 		//cout<<cadena<<endl;
 		//cadena=" ";
 		//system("pause");
