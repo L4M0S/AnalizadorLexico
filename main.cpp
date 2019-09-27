@@ -15,8 +15,6 @@ int main()
 	cout<<"nombre del archivo: ";
 	cin>>nombrearchivo;
 	cout<<endl;
-	//char* archivo;
-	//strcpy(archivo,nombrearchivo.c_str());
 	
 	if(open(nombrearchivo))	scanner();
 	else cout<<endl<<"el archivo no existe"<<endl;
