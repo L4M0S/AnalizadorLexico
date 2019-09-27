@@ -2,7 +2,6 @@
 #define scanner_h
 
 #include<cstdio>
-#include<map>
 #include<string>
 
 using namespace std;
@@ -11,7 +10,7 @@ typedef enum {_reservada,_id, _octal,_hexa,_real, _comentario, _delimitacion,_ar
 
 
 
-void open(char*);
+bool open(char*);
 void close();
 
 int read();

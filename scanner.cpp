@@ -2,11 +2,9 @@
 
 #include<cstdio>
 #include<cctype>
-#include<string>
+#include<cstring>
 #include<iostream>
 #include<map>
-#include<set>
-#include <iterator>
 
 #define udef -1
 
@@ -26,6 +24,7 @@ void llenarDiccionario()
 int p=0,q=0;
 
 int findearchivo=0;
+bool cfin=false;
 
 int lineas=1;
 
@@ -38,9 +37,23 @@ void agregar(char a)
 	cadena=cadena+a;
 }
 
-void open(char* archivo)
+bool open(char* archivo)
 {
+	
 	file=fopen(archivo,"r");
+	if(file)
+	{
+		fseek(file,0,SEEK_END);
+		findearchivo=ftell(file);
+	//printf("- findearchivo:%i -\n",findearchivo);
+	//printf("- ftello:%i -\n\n",ftell(file));
+		fseek(file,q,SEEK_SET);
+		return true;
+	}
+	
+	return false;
+	
+	//if(file==)
 	/*
 	while(fgetc(file)!=EOF)
 	{	
@@ -48,11 +61,7 @@ void open(char* archivo)
 	}
 	*/
 	//findearchivo=ftell(file);
-	fseek(file,0,SEEK_END);
-	findearchivo=ftell(file);
-	//printf("- findearchivo:%i -\n",findearchivo);
-	//printf("- ftello:%i -\n\n",ftell(file));
-	fseek(file,q,SEEK_SET);
+	
 }
 
 void close()
@@ -107,7 +116,7 @@ void wsp()
 	//*/
 	//*
 	int e=read();
-	while(isspace(e))
+	while(e==10 || e==32 || e==9)
 	{
 		if(e==10) 
 		{
@@ -127,8 +136,8 @@ void wsp()
 bool eof()
 {
 	//*
-	cout<<endl<<ftell(file)<<" "<<findearchivo<<endl;
-	if(ftell(file)>=findearchivo || feof(file) )
+	//cout<<endl<<ftell(file)<<" "<<findearchivo<<endl;
+	if(ftell(file)>=findearchivo || cfin==true)
 	//if(read()==EOF)
 	{
 		//printf("true\n");
@@ -369,8 +378,9 @@ token comentario()
 				break;
 			case 1:
 				//printf("case1 ");
-				if(c!=10) actual=1;
+				if(c!=10 && c!=-1) actual=1;
 				else if(c==10) {actual=2;lineas++;}//cout<<endl<<"c"<<lineas<<endl;
+				
 				else actual=udef;
 				break;
 			case 2:
@@ -379,6 +389,8 @@ token comentario()
 		}
 		//printf("actual:%i ",actual);
 		//c=NULL;
+		if(c==-1) {cfin=true;}
+		//cout<<endl<<c<<endl;
 	}
 	//printf("\nprior:%i \n",prior);
 	if(prior==2)
@@ -573,6 +585,7 @@ void scanner()
 	token a;
 	do
 	{
+		
 		//printf("otra \n");
 		a=next();
 		//if(a==_eof)printf("final\n");
