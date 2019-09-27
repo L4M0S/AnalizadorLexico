@@ -1,9 +1,24 @@
+#palabras reservadas
+identify transpose
+throw
+#identificadores
 dfd6fd _rgdfg
-edf'' p
+edf'' p'
 t8yfy
+#reales
 43 1.2 2E2
+
 12e+12 9
+#octales
 071 012 011
 01
+#hexadecimales
 0x12 0X0202
 0x00 0X200976
+#especiales
+()
+
+[]
++-*/
+,;
+:
