@@ -14,13 +14,6 @@ typedef std::map <int,string> Diccionario;
 
 Diccionario reservadas;
 
-void llenarDiccionario()
-{
-	reservadas[0]="identity";
-	reservadas[1]="transpose";
-	reservadas[2]="throw";
-}
-
 int p=0,q=0;
 
 int findearchivo=0;
@@ -32,6 +25,25 @@ string cadena="";
 
 FILE *file;
 
+string getCadena()
+{
+	string cadenaR=cadena;
+	cadena="";
+	return cadenaR;
+}
+
+int getLineas()
+{
+	return lineas;
+}
+
+void llenarDiccionario()
+{
+	reservadas[0]="identity";
+	reservadas[1]="transpose";
+	reservadas[2]="throw";
+}
+
 void agregar(char a)
 {
 	cadena=cadena+a;
@@ -39,6 +51,7 @@ void agregar(char a)
 
 bool open(char* archivo)
 {
+	llenarDiccionario();
 	
 	file=fopen(archivo,"r");
 	if(file)
@@ -340,39 +353,9 @@ token especiales()
 				else actual=udef;
 				
 				break;
-			case 1:
-				actual=udef;
-				break;
-			case 2:
-				actual=udef;
-				break;
-			case 3:
-				actual=udef;
-				break;
-			case 4:
-				actual=udef;
-				break;
-			case 5:
-				actual=udef;
-				break;
-			case 6:
-				actual=udef;
-				break;
-			case 7:
-				actual=udef;
-				break;
-			case 8:
-				actual=udef;
-				break;
-			case 9:
-				actual=udef;
-				break;
-			case 10:
-				actual=udef;
-				break;
-			case 11:
-				actual=udef;
-				break;
+			default: actual=udef;
+			break;
+			
 		}
 		if(actual!=udef)agregar(c);
 	}
@@ -381,19 +364,26 @@ token especiales()
 	{
 		fallback();
 		success();
-		return _delimitacion;		
+		if(prior==1) return _delParIzq;
+		else if(prior==2) return _delParDer;	
+		else if(prior==3) return _delCorIzq;	
+		else if(prior==4) return _delCorDer;	
 	}	
 	else if(prior==5 || prior==6 || prior==7 || prior==8)
 	{
 		fallback();
 		success();
-		return _aritmetico;		
+		if(prior==5) return _ariSuma;
+		else if(prior==6) return _ariResta;	
+		else if(prior==7) return _ariMulti;	
+		else if(prior==8) return _ariDivi;		
 	}	
 	else if(prior==9 || prior==10)
 	{
 		fallback();
 		success();
-		return _puntuacion;
+		if(prior==9) return _puntComa;
+		else if(prior==10) return _puntPuntoComa;
 	}
 	else if(prior==11)
 	{
@@ -438,12 +428,29 @@ token next()
 	
 	switch(especiales())
 	{
-		case _delimitacion: return _delimitacion; 
+		case _delParDer: return _delParDer; 
 	 		break;
-		case _aritmetico: return _aritmetico; 
+		case _delParIzq: return _delParIzq; 
+	 		break;
+		case _delCorDer: return _delCorDer; 
+	 		break;
+		case _delCorIzq: return _delCorIzq; 
+	 		break;
+	 		
+		case _ariSuma: return _ariSuma; 
 	        break;
-		case _puntuacion: return _puntuacion; 
+		case _ariResta: return _ariResta; 
+	        break;
+		case _ariMulti: return _ariMulti; 
+	        break;
+		case _ariDivi: return _ariDivi; 
+	        break;
+	        
+		case _puntComa: return _puntComa; 
 	    	break;
+		case _puntPuntoComa: return _puntPuntoComa; 
+	    	break;
+	    	
         case _asignacion: return _asignacion; 
 	 		break;	 
 	}
@@ -472,6 +479,7 @@ void scanner()
 				printf("identificador: ");cout<<cadena<<endl;
 				cadena="";
 				break;
+				
 			case _octal:
 				printf("octal: ");cout<<cadena<<endl;
 				cadena="";
@@ -484,22 +492,55 @@ void scanner()
 				printf("real: ");cout<<cadena<<endl;
 				cadena="";
 				break;
-			case _delimitacion:
-				printf("delimitacion: ");cout<<cadena<<endl;
+				
+			case _delParDer:
+				printf("delimitacion parentesis derecho: ");cout<<cadena<<endl;
 				cadena="";
 				break;
-			case _aritmetico:
-				printf("aritmetico: ");cout<<cadena<<endl;
+			case _delParIzq:
+				printf("delimitacion parentesis izquierdo: ");cout<<cadena<<endl;
 				cadena="";
 				break;
-			case _puntuacion:
-				printf("puntuacion: ");cout<<cadena<<endl;
+			case _delCorDer:
+				printf("delimitacion corchete derecho: ");cout<<cadena<<endl;
 				cadena="";
 				break;
+			case _delCorIzq:
+				printf("delimitacion corchete izquierdo: ");cout<<cadena<<endl;
+				cadena="";
+				break;
+			
+			case _ariSuma:
+				printf("aritmetico suma: ");cout<<cadena<<endl;
+				cadena="";
+				break;
+			case _ariResta:
+				printf("aritmetico resta: ");cout<<cadena<<endl;
+				cadena="";
+				break;
+			case _ariMulti:
+				printf("aritmetico multiplicacion: ");cout<<cadena<<endl;
+				cadena="";
+				break;
+			case _ariDivi:
+				printf("aritmetico divicion: ");cout<<cadena<<endl;
+				cadena="";
+				break;
+				
+			case _puntComa:
+				printf("puntuacion coma: ");cout<<cadena<<endl;
+				cadena="";
+				break;
+			case _puntPuntoComa:
+				printf("puntuacion punto y coma: ");cout<<cadena<<endl;
+				cadena="";
+				break;
+				
 			case _asignacion:
 				printf("asignacion: ");cout<<cadena<<endl;
 				cadena="";
 				break;
+				
 			case _eof:
 				printf("\neof\n");
 				printf("Analisis finalizado. Lineas analizadas: %i \n",lineas);

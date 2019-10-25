@@ -6,7 +6,14 @@
 
 using namespace std;
 
-typedef enum {_reservada,_id, _octal,_hexa,_real, _comentario, _delimitacion,_aritmetico,_puntuacion,_asignacion, _eof,_error} token;
+typedef enum {_reservada,_id, 
+			_octal,_hexa,_real,
+			_comentario,
+			_delParDer,_delParIzq,_delCorDer,_delCorIzq,
+			_ariSuma,_ariResta,_ariMulti,_ariDivi,
+			_puntComa,_puntPuntoComa,
+			_asignacion, 
+			_eof,_error} token;
 
 
 
@@ -29,6 +36,9 @@ token especiales();
 void scanner();
 
 void agregar(char);
+
+string getCadena();
+int getLineas();
 
 #endif
 
